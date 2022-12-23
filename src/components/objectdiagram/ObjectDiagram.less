@@ -1,0 +1,95 @@
+@headerHeight: 60px;
+@borderRadius: 4px;
+
+// d-flex flex-row/column justify-content-start/center/end-between align-items-start/end/center flex-wrap/nowrap
+// w/h-25/50/75/100/auto
+// m/p-t/b/s/e/x/y-0/1/2/3/5/auto
+// border border-top/end/bottom/start-0/1/2/3/5
+// rounded rounded-top/end/bottom/start/circle/pill 0/1/2/3/4/5
+// shadow-none/sm/lg
+
+.objectdiagram {
+  .d-header {
+    height: @headerHeight;
+
+    .d-name {
+      border-radius: 0;
+
+      &:focus {
+        border-radius: 0.375rem;
+      }
+    }
+  }
+
+  .d-content {
+    height: calc(~"100% - @{headerHeight}");
+
+    .d-svgContainer {
+      &.d-svg-mouse {
+        svg {
+          background: white;
+        }
+
+        * {
+          -webkit-user-select: none; /* Safari */
+          -ms-user-select: none; /* IE 10 and IE 11 */
+          user-select: none; /* Standard syntax */
+        }
+      }
+
+      .d-table {
+        .d-table-border {
+          height: 100%;
+          border: 1px solid #333;
+          border-radius: @borderRadius;
+          padding: 10px;
+          position: relative;
+
+          &.d-table-selected {
+            border-color: green;
+          }
+
+          .d-table-title {
+            color: #333;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .d-table-title-line {
+            border-top: 1px solid green;
+          }
+
+          .d-table-attrs {
+            gap: 5px;
+            overflow: auto;
+
+            .d-attr {
+              gap: 5px;
+              height: inherit;
+              white-space: nowrap;
+              overflow-x: clip;
+              text-overflow: ellipsis;
+
+              .d-attr-required {
+                color: red;
+                margin-left: -5px;
+              }
+
+              .d-attr-color {
+                min-width: 10px;
+                height: 10px;
+                border-radius: @borderRadius;
+              }
+            }
+          }
+
+          .d-resizer {
+            cursor: nw-resize;
+          }
+        }
+      }
+    }
+  }
+}

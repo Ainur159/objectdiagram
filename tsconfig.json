@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "rootDir": ".",
+    "outDir": "lib",
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "strictNullChecks": true,
+    "lib": ["dom", "es5", "es2015.collection", "es2015.iterable", "es2017.object"],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/customTypings"
+    ],
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": ["node_modules"]
+}
+
