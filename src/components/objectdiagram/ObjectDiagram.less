@@ -8,8 +8,44 @@
 // rounded rounded-top/end/bottom/start/circle/pill 0/1/2/3/4/5
 // shadow-none/sm/lg
 
+.setHoverScrollbarStyle() {
+  /* ff */
+  scrollbar-width: thin;
+  scrollbar-color: inherit inherit;
+
+  /* chrome */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background-color: inherit;
+    opacity: 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background-color: inherit;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: inherit;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &:hover {
+    scrollbar-color: #c4c4c4 inherit;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #aaa;
+    }
+  }
+}
+
 .objectdiagram {
   .d-header {
+    background-color: #fff;
     height: @headerHeight;
 
     .d-name {
@@ -22,9 +58,12 @@
   }
 
   .d-content {
+    background-color: rgb(240, 240, 240);
     height: calc(~"100% - @{headerHeight}");
 
     .d-svgContainer {
+      background-color: #fff;
+      
       &.d-svg-mouse {
         svg {
           background: white;
@@ -42,32 +81,44 @@
           height: 100%;
           border: 1px solid #333;
           border-radius: @borderRadius;
-          padding: 10px;
+          position: relative;
+          background: #fff;
+          overflow: hidden;
           position: relative;
 
           &.d-table-selected {
             border-color: green;
           }
 
-          .d-table-title {
-            color: #333;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          .d-table-header {
+            padding: 10px 10px 5px 10px;
+            // position: sticky;
+            // top: 0;
+            // background-color: #fff;
+
+            .d-table-title {
+              color: #333;
+              font-weight: bold;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+  
+            .d-table-title-line {
+              border-top: 1px solid green;
+            }
           }
 
-          .d-table-title-line {
-            border-top: 1px solid green;
-          }
 
           .d-table-attrs {
+            padding: 0 5px 0 10px;
             gap: 5px;
             overflow: auto;
+            .setHoverScrollbarStyle();
 
             .d-attr {
               gap: 5px;
-              height: inherit;
+              // height: inherit;
               white-space: nowrap;
               overflow-x: clip;
               text-overflow: ellipsis;
@@ -87,8 +138,16 @@
 
           .d-resizer {
             cursor: nw-resize;
+            position: absolute;
+            bottom: -3px;
+            right: 1px;
           }
         }
+      }
+
+      .d-grid-point {
+        z-index: -1;
+        fill: #c3c3c3;
       }
     }
   }

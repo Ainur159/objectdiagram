@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ObjectDigramStore } from "./store/ObjectDigramStore";
-import { svgNS } from "./utils";
+import { svgNS } from "./store/SvgProvider";
 import classNames from "classnames";
 import "./ObjectDiagram.less";
 import { Button, TextField } from "../controls/Controls";
 import { observer } from "mobx-react-lite";
 import { useStore } from "./ObjectDiagramProvider";
 import { Table } from "./components/Table";
-import { autorun, reaction } from "mobx";
+import { Point } from "./components/Point";
 
 export const ObjectDiagram = observer(() => {
   const svgContainerRef = useRef<SVGSVGElement>(null);
@@ -17,7 +17,7 @@ export const ObjectDiagram = observer(() => {
 
   useEffect(() => {
     if (!isInit) {
-      store.init();
+      store.init(svgContainerRef?.current);
       setIsInit(true);
     }
   });
@@ -41,13 +41,18 @@ export const ObjectDiagram = observer(() => {
   const onSvgMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const { clientX, clientY } = e;
     store.svgMouseMove(clientX, clientY);
-
-    svgContainerRef.current &&
-      (svgContainerRef.current.style.backgroundColor = "#fff");
   };
 
   const onSvgMouseUp = () => {
     store.svgMouseUp();
+  };
+
+  const onSvgMouseWheel = (e: React.WheelEvent<SVGSVGElement>) => {
+    let a = 10;
+  };
+
+  const onContextMenu = (e: React.MouseEvent<SVGSVGElement>) => {
+    e.preventDefault();
   };
 
   return (
@@ -85,7 +90,7 @@ export const ObjectDiagram = observer(() => {
         <div
           className={classNames(
             "d-svgContainer h-100 border border-1",
-            store.isDown && "d-svg-mouse"
+            (store.isDown || store.isResize) && "d-svg-mouse"
           )}
         >
           <svg
@@ -96,7 +101,24 @@ export const ObjectDiagram = observer(() => {
             onMouseDown={onSvgMouseDown}
             onMouseMove={onSvgMouseMove}
             onMouseUp={onSvgMouseUp}
+            onWheel={onSvgMouseWheel}
+            onContextMenu={onContextMenu}
           >
+            {Object.keys(store.gridPoints).map((rowY) => {
+              const rowPoints = store.gridPoints[rowY];
+              if (!rowPoints) {
+                return <></>;
+              }
+              return Object.keys(rowPoints).map((rowX) => {
+                const point = rowPoints[rowX];
+                if (!point) {
+                  return <></>;
+                }
+                return (
+                  <Point key={point.id} {...point} className="d-grid-point" />
+                );
+              });
+            })}
             {store.tables.map((table) => {
               return <Table key={table.id} {...table} />;
             })}

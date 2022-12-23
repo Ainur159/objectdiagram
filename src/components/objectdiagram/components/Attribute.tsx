@@ -1,23 +1,5 @@
-import { observer } from "mobx-react-lite";
 import React from "react";
-
-export type IAttributeType = "STRING" | "NUMBER" | "OBJECT" | "CUSTOM";
-
-const TypeToColor = {
-  STRING: "red",
-  NUMBER: "yellow",
-  OBJECT: "blue",
-  CUSTOM: "green",
-};
-
-export interface IAttributeProps {
-  id: number;
-  name?: string;
-  ident?: string;
-  showTypeColor?: boolean;
-  type?: IAttributeType;
-  required?: boolean;
-}
+import { IAttributeProps, TypeToColor } from "./types";
 
 export const Attribute = (props: IAttributeProps) => {
   return (

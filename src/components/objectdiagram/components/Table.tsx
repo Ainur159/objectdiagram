@@ -2,20 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../ObjectDiagramProvider";
 import { ObjectDigramStore } from "../store/ObjectDigramStore";
-import { Attribute, IAttributeProps } from "./Attribute";
+import { Attribute } from "./Attribute";
 import classNames from "classnames";
 import { observable } from "mobx";
-
-export interface ITableProps {
-  id: number;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  title: string;
-  attrs: IAttributeProps[];
-  isSelected: boolean;
-}
+import { ITableProps } from "./types";
+import { ResizerSvgIcon } from "./ResizerIcon";
 
 const TABLE_PADDING = 10;
 
@@ -44,6 +35,16 @@ export const Table = observer((props: ITableProps) => {
     e.stopPropagation();
   };
 
+  const onResizerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    store.onTableResizeDown?.(props.id);
+    e.stopPropagation();
+  };
+
+  const onResizerMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+    store.onTableResizeUp?.();
+    e.stopPropagation();
+  };
+
   return (
     <g className="d-table" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
       <foreignObject
@@ -58,15 +59,19 @@ export const Table = observer((props: ITableProps) => {
             props.isSelected && "d-table-selected"
           )}
         >
-          <div className="d-table-title">{props.title}</div>
-          <div className="d-table-title-line" ref={titleLineRef} />
+          <div className="d-table-header">
+            <div className="d-table-title">{props.title}</div>
+            <div className="d-table-title-line" ref={titleLineRef} />
+          </div>
           {/* TODO table */}
-          <div className="d-table-attrs d-flex flex-column pt-1" ref={attrsRef}>
+          <div className="d-table-attrs d-flex flex-column" ref={attrsRef}>
             {props.attrs.map((el) => {
               return <Attribute key={el.id} {...el} />;
             })}
           </div>
-          <div className="d-resizer">z</div>
+          <div className="d-resizer" onMouseDown={onResizerMouseDown} onMouseUp={onResizerMouseUp}>
+            <ResizerSvgIcon />
+          </div>
         </div>
       </foreignObject>
     </g>

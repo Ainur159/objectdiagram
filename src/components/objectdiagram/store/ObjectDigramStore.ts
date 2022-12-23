@@ -1,15 +1,19 @@
 import { observable, action, makeAutoObservable, computed } from "mobx";
-import { ITableProps } from "../components/Table";
+import { IPointProps, ISettings, ITableProps } from "../components/types";
+import { SvgProvider } from "./SvgProvider";
 
 export class ObjectDigramStore {
   @observable
-  name: string = "";
+  name: string = "test diagram";
 
   @observable
-  tables = observable.array<ITableProps>([]);
+  tables = observable.array<ITableProps>();
 
   @observable
-  relations = observable.array<any>([]);
+  relations = observable.array<any>();
+
+  @observable.ref
+  gridPoints = {};
 
   @observable
   selectedTableId?: number;
@@ -26,12 +30,35 @@ export class ObjectDigramStore {
   @observable
   isResize: boolean = false;
 
+  @observable
+  settings: ISettings = {
+    scale: 100,
+    x0: 0,
+    y0: 0,
+    tableName: true,
+    tableIdent: false,
+    attrName: true,
+    attrType: true,
+    attrIdent: false,
+    attrRequired: false,
+    typeColor: true,
+    relationType: true,
+    relationLineType: true,
+  };
+
+  svgContainer: SVGSVGElement | null;
+
   constructor() {}
 
-  init = (id?: number) => {
+  init = (svgContainer: SVGSVGElement | null, id?: number) => {
+    this.svgContainer = svgContainer;
+    this.initGridPoints();
+
     if (id) {
       // TODO
+      return;
     }
+
     this.tables.push({
       id: 1,
       x: 100,
@@ -62,6 +89,15 @@ export class ObjectDigramStore {
   };
 
   @action
+  initGridPoints = () => {
+    if (!this.svgContainer) {
+      return;
+    }
+    const { clientWidth, clientHeight } = this.svgContainer;
+    this.gridPoints = SvgProvider.createGridPoints(clientWidth, clientHeight);
+  };
+
+  @action
   changeName = (name: string) => {
     this.name = name;
   };
@@ -74,8 +110,13 @@ export class ObjectDigramStore {
 
   @action
   svgMouseMove = (newX: number, newY: number) => {
-    if (this.isDown && this.selectedTable) {
-      this.tableMove(newX - this.x0, newY - this.y0);
+    const dx = newX - this.x0;
+    const dy = newY - this.y0;
+    if (this.isResize && this.selectedTable) {
+      this.selectedTable.width += dx;
+      this.selectedTable.height += dy;
+    } else if (this.isDown && this.selectedTable) {
+      this.tableMove(dx, dy);
     }
     this.x0 = newX;
     this.y0 = newY;
@@ -83,7 +124,12 @@ export class ObjectDigramStore {
 
   @action
   svgMouseUp = () => {
-    this.isDown = false;
+    if (this.isResize) {
+      this.onTableResizeUp();
+    }
+    if (this.selectedTable) {
+      this.onTableMouseUp();
+    }
   };
 
   @computed
@@ -121,5 +167,35 @@ export class ObjectDigramStore {
   @action
   onTableMouseUp = () => {
     this.isDown = false;
+    if (!this.selectedTable) {
+      return;
+    }
+
+    if (this.isResize) {
+      this.onTableResizeUp();
+      return;
+    }
+
+    const { x: oldX, y: oldY } = this.selectedTable;
+    const { x, y } =
+      SvgProvider.nearPointInGrid(this.gridPoints, oldX, oldY) || {};
+
+    if (!x || !y) {
+      return;
+    }
+
+    this.selectedTable.x = x;
+    this.selectedTable.y = y;
+  };
+
+  @action
+  onTableResizeDown = (id: number) => {
+    this.selectTable(id);
+    this.isResize = true;
+  };
+
+  @action
+  onTableResizeUp = () => {
+    this.isResize = false;
   };
 }
