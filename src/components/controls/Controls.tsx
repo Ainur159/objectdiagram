@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { observable } from "mobx";
 import { observer } from "mobx-react-lite";
 import React, {
   HTMLInputTypeAttribute,
@@ -14,6 +15,8 @@ export interface IButtonProps extends PropsWithChildren {
   disabled?: boolean;
   className?: string;
   isTransparent?: boolean;
+  dataBsToggle?: string;
+  dataBsTargetId?: string;
 }
 
 export const Button = (props: IButtonProps) => {
@@ -31,6 +34,8 @@ export const Button = (props: IButtonProps) => {
       className={getClassName()}
       onClick={props.onClick}
       disabled={props.disabled}
+      data-bs-toggle={props.dataBsToggle}
+      data-bs-target={`#${props.dataBsTargetId}`}
     >
       {props.children}
     </button>
@@ -89,3 +94,28 @@ export const TextField = observer((props: ITextFieldProps) => {
     </div>
   );
 });
+
+export interface ISwitchControlProps {
+  label?: string;
+  value?: boolean;
+  onChange?: (val: boolean) => void;
+}
+
+export const SwitchControl = (props: ISwitchControlProps) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    props.onChange?.(e.target.checked);
+  };
+
+  return (
+    <div className="form-check form-switch">
+      <input
+        className="form-check-input"
+        type="checkbox"
+        role="switch"
+        checked={props.value}
+        onChange={onChange}
+      />
+      <label className="form-check-label">{props.label}</label>
+    </div>
+  );
+};

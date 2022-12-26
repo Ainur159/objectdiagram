@@ -3,15 +3,17 @@ import { ObjectDigramStore } from "./store/ObjectDigramStore";
 import { svgNS } from "./store/SvgProvider";
 import classNames from "classnames";
 import "./ObjectDiagram.less";
-import { Button, TextField } from "../controls/Controls";
+import { Button, SwitchControl, TextField } from "../controls/Controls";
 import { observer } from "mobx-react-lite";
 import { useStore } from "./ObjectDiagramProvider";
 import { Table } from "./components/Table";
 import { Point } from "./components/Point";
+import { Modal } from "../controls/Modal";
 
 export const ObjectDiagram = observer(() => {
   const svgContainerRef = useRef<SVGSVGElement>(null);
   const [isInit, setIsInit] = useState(false);
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const store: ObjectDigramStore = useStore();
 
@@ -55,6 +57,14 @@ export const ObjectDiagram = observer(() => {
     e.preventDefault();
   };
 
+  const openSettingsModal = () => {
+    setSettingsModalOpen(true);
+  };
+
+  const closeSettingsModal = () => {
+    setSettingsModalOpen(false);
+  };
+
   return (
     <div className={"objectdiagram h-100"}>
       <div
@@ -64,9 +74,12 @@ export const ObjectDiagram = observer(() => {
           "d-flex align-items-center justify-content-between p-2"
         )}
       >
-        <div className="">
+        <div className="d-header-btns">
           <Button onClick={createDiagramClick} isCircle={true}>
             <i className="bi bi-plus-lg"></i>
+          </Button>
+          <Button onClick={openSettingsModal} isCircle={true} dataBsToggle="modal" dataBsTargetId="settingsModal">
+            <i className="bi bi-gear"></i>
           </Button>
         </div>
         <div>
@@ -123,6 +136,53 @@ export const ObjectDiagram = observer(() => {
               return <Table key={table.id} {...table} />;
             })}
           </svg>
+          {settingsModalOpen && (
+            <Modal header="Настройки" onClose={closeSettingsModal} id="settingsModal" footer={
+              [
+                <Button onClick={closeSettingsModal} isPill={true}>{"ОК"}</Button>
+              ]
+            }>
+              <div className="container-fluid">
+                <div className="row">
+                  <h4>{"Тип"}</h4>
+                  <div className="col-6">
+                    <SwitchControl label="Наименование" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Идентификатор" />
+                  </div>
+                </div>
+                <div className="row">
+                  <h4>{"Атрибуты"}</h4>
+                  <div className="col-6">
+                    <SwitchControl label="Наименование" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Идентификатор" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Обязательность" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Цвет" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Тип" />
+                  </div>
+                  <div className="col-6"></div>
+                </div>
+                <div className="row">
+                  <h4>{"Связи"}</h4>
+                  <div className="col-6">
+                    <SwitchControl label="Текст" />
+                  </div>
+                  <div className="col-6">
+                    <SwitchControl label="Прямой тип линии" />
+                  </div>
+                </div>
+              </div>
+            </Modal>
+          )}
         </div>
       </div>
     </div>
